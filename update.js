@@ -1,11 +1,11 @@
 const fs = require('fs');
 
 // ==================== НАСТРОЙКИ ====================
-// 1. Ссылка на твой оффер / основной сайт / TG-канал
-const TARGET_URL = "https://your-main-site.com/landing?ref=doorway";
+// 1. Ссылка на твой оффер / основной сайт / TG-канал (ЗАМЕНИ НА СВОЮ)
+const TARGET_URL = "https://t.me/your_telegram_channel"; 
 
-// 2. Ссылка на твой GitHub Pages (Замени USERNAME на твой логин GitHub, а REPO — на имя репозитория)
-const SITE_DOMAIN = "https://USERNAME.github.io/REPO";
+// 2. Адрес твоего GitHub Pages (УЖЕ ВСТРОЕН)
+const SITE_DOMAIN = "https://rifkat02.github.io/my-doorway";
 
 // 3. Базовые ключи (если файл keywords.txt окажется пустым)
 const SEED_KEYWORDS = [
@@ -149,7 +149,7 @@ async function main() {
             <ul>
 `;
 
-        // Генерация случаных ссылок для перелинковки
+        // Генерация случайных ссылок для перелинковки
         const randomLinks = allKeywords.filter(k => k !== kw).sort(() => 0.5 - Math.random()).slice(0, 8);
         for (const otherKw of randomLinks) {
             const otherSlug = slugify(otherKw);
