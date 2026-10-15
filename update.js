@@ -1,18 +1,8 @@
 const fs = require('fs');
 
 // ==================== НАСТРОЙКИ ====================
-// 1. Ссылка на твой оффер / основной сайт / TG-канал (ЗАМЕНИ НА СВОЮ)
-const TARGET_URL = "https://t.me/your_telegram_channel"; 
-
-// 2. Адрес твоего GitHub Pages (УЖЕ ВСТРОЕН)
-const SITE_DOMAIN = "https://rifkat02.github.io/my-doorway";
-
-// 3. Базовые ключи (если файл keywords.txt окажется пустым)
-const SEED_KEYWORDS = [
-    "купить курс по программированию",
-    "лучшие сервисы автоматизации",
-    "как заработать на нейросетях"
-];
+const TARGET_URL = "https://t.me/your_telegram_channel"; // Куда сливать трафик
+const SITE_DOMAIN = "https://rifkat02.github.io/my-doorway"; // Твой адрес сайта
 // ====================================================
 
 function slugify(text) {
@@ -21,25 +11,12 @@ function slugify(text) {
         .replace(/^-+|-+$/g, '');
 }
 
-// Парсинг поисковых подсказок Google (Google Suggestions)
-async function getGoogleSuggestions(keyword) {
-    try {
-        const url = `https://suggestqueries.google.com/complete/search?client=firefox&hl=ru&q=${encodeURIComponent(keyword)}`;
-        const res = await fetch(url);
-        const data = await res.json();
-        return data[1] || [];
-    } catch (e) {
-        console.log(`Ошибка парсинга подсказок для "${keyword}":`, e.message);
-        return [];
-    }
-}
-
 if (!fs.existsSync('pages')) {
     fs.mkdirSync('pages');
 }
 
 async function main() {
-    console.log("1. Чтение и парсинг новых ключевых слов...");
+    console.log("🛠 Генерация HTML-страниц по собранным ключам...");
     
     let currentKeywords = [];
     if (fs.existsSync('keywords.txt')) {
@@ -48,29 +25,10 @@ async function main() {
     }
     
     if (currentKeywords.length === 0) {
-        currentKeywords = [...SEED_KEYWORDS];
+        currentKeywords = ["юрист онлайн"];
     }
 
-    const keywordSet = new Set(currentKeywords);
-
-    // Сбор подсказок для первых 10 ключей
-    for (const baseKw of currentKeywords.slice(0, 10)) {
-        console.log(`Собираем подсказки по: "${baseKw}"...`);
-        const suggestions = await getGoogleSuggestions(baseKw);
-        for (const sug of suggestions) {
-            if (sug && sug.trim().length > 3) {
-                keywordSet.add(sug.trim().toLowerCase());
-            }
-        }
-    }
-
-    const allKeywords = Array.from(keywordSet);
-    console.log(`Всего ключевых слов в базе: ${allKeywords.length}`);
-
-    // Перезаписываем обновленный список ключей
-    fs.writeFileSync('keywords.txt', allKeywords.join('\n'), 'utf-8');
-
-    console.log("2. Генерация HTML-страниц...");
+    const allKeywords = currentKeywords;
     let generatedPages = [];
 
     for (const kw of allKeywords) {
@@ -80,7 +38,6 @@ async function main() {
         const pageFilename = `pages/${slug}.html`;
         let articlesHtml = `<li>Актуальные данные по запросу "${kw}" обновляются...</li>`;
 
-        // Запрос свежих новостей через Google News RSS
         try {
             const rssUrl = `https://news.google.com/rss/search?q=${encodeURIComponent(kw)}&hl=ru&gl=RU&ceid=RU:ru`;
             const res = await fetch(rssUrl);
@@ -104,11 +61,8 @@ async function main() {
             if (titles.length > 0) {
                 articlesHtml = titles.map(art => `<li><a href="${art.link}" target="_blank" rel="nofollow">${art.title}</a></li>`).join('');
             }
-        } catch (e) {
-            // Если новостей нет — пропускаем
-        }
+        } catch (e) {}
 
-        // Шаблон целевой дорвей-страницы
         let htmlContent = `<!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -150,7 +104,6 @@ async function main() {
             <ul>
 `;
 
-        // Генерация случайных ссылок для перелинковки
         const randomLinks = allKeywords.filter(k => k !== kw).sort(() => 0.5 - Math.random()).slice(0, 8);
         for (const otherKw of randomLinks) {
             const otherSlug = slugify(otherKw);
@@ -169,7 +122,6 @@ async function main() {
         generatedPages.push({ kw, path: pageFilename });
     }
 
-    // Генерация главного каталога index.html
     let indexHtml = `<!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -194,7 +146,6 @@ async function main() {
     indexHtml += `\n</div></body></html>`;
     fs.writeFileSync('index.html', indexHtml, 'utf-8');
 
-    // Генерация sitemap.xml
     let sitemap = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n';
     sitemap += `  <url><loc>${SITE_DOMAIN}/index.html</loc><priority>1.0</priority></url>\n`;
 
@@ -204,7 +155,7 @@ async function main() {
     sitemap += `</urlset>`;
 
     fs.writeFileSync('sitemap.xml', sitemap, 'utf-8');
-    console.log("Готово!");
+    console.log("Сайт и карта сгенерированы успешно!");
 }
 
 main();
