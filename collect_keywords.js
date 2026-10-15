@@ -1,18 +1,17 @@
 const fs = require('fs');
 
-// Базовые темы, с которых начинается сбор
+// Базовые семенные темы для генерации глубоких хвостов
 const SEED_KEYWORDS = [
     "юрист онлайн",
     "помощь юриста"
 ];
 
-// Русской алфавит и пробел для получения глубоких хвостов НЧ
+// Символы и буквы для перебора в подсказках Google (дает сотни НЧ запросов)
 const ALPHABET = ['', ' а', ' б', ' в', ' г', ' д', ' е', ' ж', ' з', ' и', ' к', ' л', ' м', ' н', ' о', ' п', ' р', ' с', ' т', ' у', ' ф', ' х', ' ц', ' ч', ' ш', ' щ', ' э', ' ю', ' я'];
 
-// Поисковые префиксы (модификаторы для сбора горячего трафика)
+// Поисковые префиксы-модификаторы
 const PREFIXES = ['как ', 'где ', 'цена ', 'купить ', 'лучший ', 'отзывы о '];
 
-// Функция запроса подсказок Google
 async function fetchSuggestions(query) {
     try {
         const url = `https://suggestqueries.google.com/complete/search?client=firefox&hl=ru&q=${encodeURIComponent(query)}`;
@@ -24,7 +23,6 @@ async function fetchSuggestions(query) {
     }
 }
 
-// Пауза между запросами, чтобы Google не заблокировал IP
 async function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
@@ -34,7 +32,7 @@ async function main() {
     
     let baseKeywords = SEED_KEYWORDS;
     
-    // Если файл keywords.txt уже существует, берем оттуда первые 5 ключей для расширения
+    // Если в keywords.txt уже есть ключи, берем первые 5 для расширения
     if (fs.existsSync('keywords.txt')) {
         const file = fs.readFileSync('keywords.txt', 'utf-8');
         const lines = file.split('\n').map(k => k.trim()).filter(Boolean);
@@ -45,43 +43,43 @@ async function main() {
 
     const allKeys = new Set();
 
-    // Загружаем уже имеющиеся ключи, если есть
+    // Загружаем старые ключи
     if (fs.existsSync('keywords.txt')) {
         const existing = fs.readFileSync('keywords.txt', 'utf-8').split('\n');
         existing.forEach(k => { if(k.trim()) allKeys.add(k.trim().toLowerCase()); });
     }
 
     for (const seed of baseKeywords) {
-        console.log(`🔍 Парсим базу по ключу: "${seed}"...`);
+        console.log(`🔍 Парсим подсказки по семени: "${seed}"...`);
         
-        // 1. Прямые подсказки
+        // Прямой запрос
         const direct = await fetchSuggestions(seed);
         direct.forEach(k => allKeys.add(k.toLowerCase()));
-        await sleep(300);
+        await sleep(250);
 
-        // 2. Буквенный перебор (дает сотни НЧ-запросов вида "юрист онлайн москва", "юрист онлайн бесплатно спб" и т.д.)
+        // Перебор букв (хвосты)
         for (const letter of ALPHABET) {
             const q = seed + letter;
             const subs = await fetchSuggestions(q);
             subs.forEach(k => allKeys.add(k.toLowerCase()));
-            await sleep(250); // Защита от лимитов Google
+            await sleep(200);
         }
 
-        // 3. Перебор с префиксами
+        // Перебор префиксов
         for (const pref of PREFIXES) {
             const q = pref + seed;
             const subs = await fetchSuggestions(q);
             subs.forEach(k => allKeys.add(k.toLowerCase()));
-            await sleep(250);
+            await sleep(200);
         }
     }
 
     const result = Array.from(allKeys);
-    console.log(`✅ Собрано уникальных НЧ-ключей: ${result.length}`);
+    console.log(`✅ Всего собрано уникальных НЧ-ключей: ${result.length}`);
     
-    // Сохраняем в keywords.txt
+    // Сохраняем итоговую базу
     fs.writeFileSync('keywords.txt', result.join('\n'), 'utf-8');
-    console.log("💾 Все ключи успешно сохранены в keywords.txt!");
+    console.log("💾 База ключей успешно сохранена в keywords.txt!");
 }
 
 main();
