@@ -1,7 +1,7 @@
 const fs = require('fs');
 
 // ==================== НАСТРОЙКИ ====================
-const TARGET_URL = "https://t.me/your_telegram_channel"; // Куда сливать трафик
+const TARGET_URL = "https://t.me/your_telegram_channel"; // Ссылка для слива трафика (замени на свою)
 const SITE_DOMAIN = "https://rifkat02.github.io/my-doorway"; // Твой адрес сайта
 // ====================================================
 
@@ -69,6 +69,17 @@ async function main() {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="yandex-verification" content="bae4782113b8f044" />
+    
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-6V8S1KXS68"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-6V8S1KXS68');
+    </script>
+
     <title>${kw.charAt(0).toUpperCase() + kw.slice(1)} — Обзор и руководства</title>
     <meta name="description" content="Вся информация по запросу ${kw}. Свежие статьи и материалы.">
     <style>
@@ -128,6 +139,17 @@ async function main() {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="yandex-verification" content="bae4782113b8f044" />
+    
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-6V8S1KXS68"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-6V8S1KXS68');
+    </script>
+
     <title>Информационный портал</title>
     <style>
         body { font-family: Arial, sans-serif; max-width: 800px; margin: 40px auto; padding: 20px; }
