@@ -1,15 +1,15 @@
-name: Daily Auto Doorway & Keyword Scraper
+name: Daily Auto Deep Doorway & Keywords
 
 on:
   schedule:
     - cron: '0 8 * * *' # Автозапуск каждый день в 08:00 UTC
-  workflow_dispatch: # Возможность запустить вручную кнопкой
+  workflow_dispatch: # Ручная кнопка запуска в GitHub Actions
 
 jobs:
   update-site:
     runs-on: ubuntu-latest
     permissions:
-      contents: write # Права на запись страниц и ключей в репозиторий
+      contents: write # Права на сохранение новых ключей и страниц в репозиторий
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -19,7 +19,10 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Run keyword scraper & generator
+      - name: Run deep keyword collector (НЧ парсер)
+        run: node collect_keywords.js
+
+      - name: Run site and sitemap generator
         run: node update.js
 
       - name: Commit and push changes
@@ -29,6 +32,5 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.dev"
           git add .
-          git commit -m "Auto-scraped new keywords and updated site [skip ci]" || exit 0
+          git commit -m "Auto-collected deep keywords and updated doorway [skip ci]" || exit 0
           git push
-          
