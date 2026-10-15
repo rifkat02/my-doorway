@@ -114,6 +114,7 @@ async function main() {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="yandex-verification" content="bae4782113b8f044" />
     <title>${kw.charAt(0).toUpperCase() + kw.slice(1)} — Обзор и руководства</title>
     <meta name="description" content="Вся информация по запросу ${kw}. Свежие статьи и материалы.">
     <style>
@@ -173,6 +174,8 @@ async function main() {
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="yandex-verification" content="bae4782113b8f044" />
     <title>Информационный портал</title>
     <style>
         body { font-family: Arial, sans-serif; max-width: 800px; margin: 40px auto; padding: 20px; }
